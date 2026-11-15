@@ -44,13 +44,12 @@ button:disabled{opacity:.6}
 #hi .brand { display: flex; align-items: center; gap: calc(10px * var(--k)); height: 44px; font: 400 calc(17px * var(--k))/1 var(--display); letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; text-shadow: 0 0 2px rgba(26, 16, 38, .55), 0 1px 16px rgba(26, 16, 38, .6); }
 #hi .brand i { flex: none; display: grid; place-items: center; width: calc(30px * var(--k)); height: calc(30px * var(--k)); border-radius: 9px; background: var(--gold); color: var(--ink); font: 400 calc(11px * var(--k))/1 var(--display); letter-spacing: 0; text-shadow: none; box-shadow: 0 1px 8px rgba(26, 16, 38, .45); }
 #hi .links { position: absolute; inset: max(20px, env(safe-area-inset-top)) 0 auto; width: max-content; margin: 0 auto; display: flex; gap: 2px; padding: 4px; border-radius: 99px; }
-#hi .links button { position: relative; display: flex; align-items: center; gap: 7px; height: calc(32px * var(--k)); padding: 0 calc(16px * var(--k)); border-radius: 99px; font: 600 calc(14px * var(--k))/1 var(--sans); }
-#hi .links button[aria-current="true"] { background: var(--cream); color: var(--ink); padding-left: 13px; }
-#hi .links button[aria-current="true"]::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px rgba(26, 16, 38, .14); }
+#hi .links span { position: relative; display: flex; align-items: center; gap: 7px; height: calc(32px * var(--k)); padding: 0 calc(16px * var(--k)); border-radius: 99px; font: 600 calc(14px * var(--k))/1 var(--sans); }
+#hi .links span[aria-current="true"] { background: var(--cream); color: var(--ink); padding-left: 13px; }
+#hi .links span[aria-current="true"]::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px rgba(26, 16, 38, .14); }
 #hi .play { display: flex; align-items: center; gap: 9px; height: calc(42px * var(--k)); padding: 0 calc(18px * var(--k)) 0 calc(16px * var(--k)) !important; border-radius: 99px !important; font: 600 calc(14px * var(--k))/1 var(--sans) !important; }
 #hi .play svg { width: calc(9px * var(--k)); height: calc(11px * var(--k)); fill: var(--accent); }
 @media (hover: hover) {
-  #hi .links button:not([aria-current="true"]):hover::after { content: ""; position: absolute; left: 50%; bottom: 3px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
   #hi .play:hover, #hi .pause:hover { background-color: rgba(26, 16, 38, .78); border-color: rgba(255, 255, 255, .5); }
 }
 @media (pointer: coarse) { #hi .play { height: 44px; } }
@@ -157,7 +156,7 @@ button:disabled{opacity:.6}
 
 @media (min-width: 1800px) and (min-height: 1000px) { #hi { --k: 1.16; --head: clamp(40px, 6.2vw, 128px); } }
 @media (min-width: 2300px) and (min-height: 1260px) { #hi { --k: 1.4; --head: clamp(40px, 6.2vw, 150px); } }
-@media (max-width: 1100px) { #hi .links button { padding: 0 12px; } }
+@media (max-width: 1100px) { #hi .links span { padding: 0 12px; } }
 @media (max-width: 900px) { #hi .links { display: none; } }
 @media (max-width: 400px) { #hi .bar { gap: 8px; } #hi .play { gap: 7px; padding: 0 14px 0 12px !important; } }
 @media (max-width: 359px) { #hi .brand { font-size: min(17px, 4.5vw); } #hi .play svg { display: none; } }
@@ -187,7 +186,7 @@ button:disabled{opacity:.6}
   #hi .stage::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(rgba(26, 16, 38, 0) min(40%, 100% - 560px), color-mix(in srgb, var(--accent) 10%, rgba(26, 16, 38, .44)) min(58%, 100% - 400px), color-mix(in srgb, var(--accent) 8%, rgba(26, 16, 38, .6)) min(74%, 100% - 240px), color-mix(in srgb, var(--accent) 6%, rgba(26, 16, 38, .76))); }
   #hi .stills img { object-position: clamp(100vw - 177.78svh, 50vw - var(--c) * 177.78svh, 0px) 30%; }
   #hi.motion .reel { right: auto; width: auto; height: 100%; aspect-ratio: 16 / 9; }
-  #hi .copy, #hi .copy.right { justify-content: flex-end; align-items: center; text-align: center; padding: 0 var(--gutter) calc(max(20px, env(safe-area-inset-bottom)) + 76px); }
+  #hi .copy, #hi .copy.right { justify-content: flex-end; align-items: center; text-align: center; padding: 0 var(--gutter) calc(max(20px, env(safe-area-inset-bottom)) + 34px); }
   #hi .label { height: 26px; }
   #hi .title { margin-top: 12px; }
   #hi .pitch { margin-top: 12px; padding: 0; max-width: min(var(--colw), 30em); font-size: 15.5px; line-height: 1.45; text-wrap: balance; background: none; border: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -217,10 +216,18 @@ button:disabled{opacity:.6}
   #hi .pause { top: calc(max(20px, env(safe-area-inset-top)) + 56px); bottom: auto; left: auto; right: var(--gutter); }
 }
 
+/* the run plays through once; then the name returns with the way in */
+#hi .links span { transition: background-color .4s var(--ease), color .4s var(--ease); }
+#hi .play { transition: opacity .6s var(--ease), translate .6s var(--ease); }
+#hi:not(.final) .play { opacity: 0; translate: 0 -10px; pointer-events: none; visibility: hidden; }
+#hi .fin .title { font-size: min(calc(var(--head) * 1.18), calc(var(--colw) / var(--em2, 6.33))); }
+#hi .fin .nm { color: var(--gold); text-shadow: 0 2px 30px rgba(26, 16, 38, .45), 0 0 40px color-mix(in srgb, var(--gold) 35%, transparent); }
+#hi.final .shade { transition: opacity 1s var(--ease); }
+
 .err{color:#FCA5A5;min-height:20px;margin-top:10px;font-size:13px}
 </style></head>
 <body>
-<div class="wrap" id="gate"><div id="hi" role="dialog" aria-label="Welcome"><header class="bar"><span class="brand"><i aria-hidden="true">ME</i>Main Event</span><nav class="links glass" aria-label="Worlds"><button type="button" data-w="0" aria-current="true">Welcome</button><button type="button" data-w="1">Tickets</button><button type="button" data-w="2">Venues</button><button type="button" data-w="3">Creators</button></nav><button class="play glass zenter" type="button"><svg viewBox="0 0 9 11" aria-hidden="true"><path d="M1 1.2v8.6c0 .6.6.9 1.1.6l6.4-4.3c.4-.3.4-.9 0-1.2L2.1.6C1.6.3 1 .6 1 1.2Z"/></svg>Enter</button></header><div class="stage"><div class="reel"><img class="poster" src="w/poster.webp" alt="" width="1920" height="1080"><video class="film" muted playsinline loop preload="auto" tabindex="-1" aria-hidden="true" data-src="w/film.mp4"></video></div><div class="stills" aria-hidden="true"><img src="w/w1.webp" alt="" loading="lazy"><img src="w/w2.webp" alt="" loading="lazy"><img src="w/w3.webp" alt="" loading="lazy"><img src="w/w4.webp" alt="" loading="lazy"></div><div class="shade" aria-hidden="true"></div><div class="shade" aria-hidden="true"></div><div class="veil" aria-hidden="true"></div><div class="deck"><article class="copy left"><p class="part label glass"><i></i><span class="l1">World 01 · Access granted</span></p><h2 class="part title"><span class="g1">Hello</span> <span class="nm"></span></h2><p class="part pitch glass">This preview was set up for you. Take a look around before anyone else does.</p><p class="part act"><button class="cta zenter" type="button">Enter<span class="knob" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></button></p></article><article class="copy right"><p class="part label glass"><i></i>World 02 · Tickets and tables</p><h2 class="part title"><span>Sell</span> <span>Out</span></h2><p class="part pitch glass">Tickets, tables and group pay in one checkout, with payouts the same night.</p><p class="part act"><button class="cta zenter" type="button">Enter<span class="knob" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></button></p></article><article class="copy left"><p class="part label glass"><i></i>World 03 · Venues</p><h2 class="part title"><span>Open</span> <span>Tabs</span></h2><p class="part pitch glass">The door, the bar and the register on one system, from first scan to last call.</p><p class="part act"><button class="cta zenter" type="button">Enter<span class="knob" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></button></p></article><article class="copy right"><p class="part label glass"><i></i>World 04 · Creators</p><h2 class="part title"><span>Go</span> <span>Live</span></h2><p class="part pitch glass">Lives, memberships and coaching for the people who draw the crowd.</p><p class="part act"><button class="cta zenter" type="button">Enter<span class="knob" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></button></p></article></div><button class="pause glass" type="button" aria-label="Pause the film"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.2 3.5v9M10.8 3.5v9"/><path d="M4.5 2.8v10.4c0 .7.8 1.1 1.4.7l7.6-5.2c.5-.4.5-1.1 0-1.4L5.9 2.1c-.6-.4-1.4 0-1.4.7Z"/></svg></button><div class="worlds" role="group" aria-label="Worlds"><button class="thumb" type="button" aria-label="World 1, Welcome" aria-current="true"><img src="w/t1.webp" alt="" width="256" height="256"><svg class="ring" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/></svg></button><button class="thumb" type="button" aria-label="World 2, Tickets" aria-current="false"><img src="w/t2.webp" alt="" width="256" height="256"><svg class="ring" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/></svg></button><button class="thumb" type="button" aria-label="World 3, Venues" aria-current="false"><img src="w/t3.webp" alt="" width="256" height="256"><svg class="ring" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/></svg></button><button class="thumb" type="button" aria-label="World 4, Creators" aria-current="false"><img src="w/t4.webp" alt="" width="256" height="256"><svg class="ring" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/></svg></button></div><div class="dial glass" role="img" aria-label="VIP, all access"><svg class="spin" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52"/><circle class="lit" cx="60" cy="60" r="52"/><circle class="tip" cx="60" cy="60" r="52"/></svg><p aria-hidden="true"><b>VIP</b><span>All access</span></p></div></div></div><form class="card" id="f">
+<div class="wrap" id="gate"><div id="hi" role="dialog" aria-label="Welcome"><header class="bar"><span class="brand"><i aria-hidden="true">ME</i>Main Event</span><nav class="links glass" aria-hidden="true"><span data-w="0" aria-current="true">Welcome</span><span data-w="1">Tickets</span><span data-w="2">Venues</span><span data-w="3">Creators</span></nav><button class="play glass zenter" type="button"><svg viewBox="0 0 9 11" aria-hidden="true"><path d="M1 1.2v8.6c0 .6.6.9 1.1.6l6.4-4.3c.4-.3.4-.9 0-1.2L2.1.6C1.6.3 1 .6 1 1.2Z"/></svg>Enter</button></header><div class="stage"><div class="reel"><img class="poster" src="w/poster.webp" alt="" width="1920" height="1072"><video class="film" muted playsinline preload="auto" tabindex="-1" aria-hidden="true" data-src="w/film.mp4"></video></div><div class="stills" aria-hidden="true"><img src="w/w1.webp" alt="" loading="lazy"><img src="w/w2.webp" alt="" loading="lazy"><img src="w/w3.webp" alt="" loading="lazy"><img src="w/w4.webp" alt="" loading="lazy"></div><div class="shade" aria-hidden="true"></div><div class="shade" aria-hidden="true"></div><div class="veil" aria-hidden="true"></div><div class="deck"><article class="copy left"><h2 class="part title"><span class="g1">Hello</span> <span class="nm"></span></h2><p class="part pitch glass">This preview was set up for you. Take a look around before anyone else does.</p></article><article class="copy right"><h2 class="part title"><span>Sell</span> <span>Out</span></h2><p class="part pitch glass">Tickets, tables and group pay in one checkout, with payouts the same night.</p></article><article class="copy left"><h2 class="part title"><span>Open</span> <span>Tabs</span></h2><p class="part pitch glass">The door, the bar and the register on one system, from first scan to last call.</p></article><article class="copy right"><h2 class="part title"><span>Go</span> <span>Live</span></h2><p class="part pitch glass">Lives, memberships and coaching for the people who draw the crowd.</p></article><article class="copy left fin"><h2 class="part title"><span class="g2">Hello</span> <span class="nm"></span></h2><p class="part pitch glass">That's the run. Now step inside, it's all yours.</p><p class="part act"><button class="cta zenter" type="button">Enter<span class="knob" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></button></p></article></div></div></div><form class="card" id="f">
   <div class="mark">ME</div>
   <h1>Main Event preview</h1>
   <p>Private. Enter the passcode to open it.</p>
@@ -230,7 +237,7 @@ button:disabled{opacity:.6}
   <div class="err" id="err" role="alert"></div>
 </form></div>
 <script>
-var SALT="MnI9Kw0kBbem/UfQrI6+4A==",ITER=600000,FILES={"d": "01f2c3986c-d.bin", "m": "01f2c3986c-m.bin"},IVS={"d": "2Uz2IXVTMvm++gcX", "m": "sSCsAqnCA8A5/EAd"},WR=[{"i": "x2zS9DxAFJ7nfk+S", "c": "1nbp/ET0JKKfH0+jO90F7eP+D2aTlox/Zm7041ftkNgHyPhiuyMXhb42yG3q/nguPukRIoI="}, {"i": "TAARGg1Xm/jErdlX", "c": "fkLr4ZeAeQS3/yGXIMgvWrRKq0dNmKh87wHRtYwD5J7jYAcr+xm6thQV/l6ktsBA"}, {"i": "y+Sfak7vaaDatYGb", "c": "BdpzZ5Azew3VupoTIGnYDZ8G7rvB47K6hwx21QDu/2RgqqzzmZaR1qhPzAS2q4zxgBg="}, {"i": "UwjewYlNjl//ekc6", "c": "brO94d+AiDPxWqKM2D+l4IpysIL6hdOqYdxqyRDsIR+j33eAsI/sXz2CDiubRITD62g="}, {"i": "TikyfJfULkbey9pH", "c": "F8YR6xxbbA0oabEvwMny3WZuajqqKg2w0Jf2PSylJI9JV9xWhK/b8SUpKw5M0e4bYnqORQ=="}];
+var SALT="np4ehzhC8QCaQ/K9Xgt2+Q==",ITER=600000,FILES={"d": "b92dbbdaed-d.bin", "m": "b92dbbdaed-m.bin"},IVS={"d": "fyVnYncYU/ndsMvp", "m": "I+FT8gI3CT6PKR5e"},WR=[{"i": "Q+6uMRIPXjaKyArr", "c": "yeVhXKuGsWDTK3LvmfxUfaU8j49EZiCruLzFX5YWl6lC6/G7ttRP2HIHxyLliUa2SLCrcg=="}, {"i": "katMjhWCCOnPYFn/", "c": "tQ714yWRWvPM12YShaSRgbEqkIR8ygGiflpy8vI3BdreFa4dOauP0kQuEtoDbYSF"}, {"i": "wMFwEXr3Nv571U80", "c": "2oCN0tLPVAtLlqET05a+WbZP7Dru7yzyBJG6vEeUyVEQHL6pdvUUVyopNzYlAYfB9yd4nH4="}, {"i": "nk6zePF9znVPHffP", "c": "bpBPvobl4V3kt8sTbNMbidpNUEOvMwFNCf5S+1zIr3Cf19FpB9ZfOZJCvdz+9EvijbI="}, {"i": "m/yI1CVJ9U39YcSj", "c": "Fzy2DyI0trHoDIntGvbcHGlhtOFkAprYAZSQcDuAWDcQ/RUmoO3iN4BDa6qXvGsoJNo="}];
 function isPhone(){var w=Math.min(screen.width,screen.height);var touch=window.matchMedia&&matchMedia("(pointer:coarse)").matches;return (touch&&w<700)||innerWidth<500;}
 var VIEW=isPhone()?"m":"d",got={};
 function load(v){if(!got[v])got[v]=fetch(FILES[v],{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("stale");return r.arrayBuffer();});return got[v];}
@@ -264,39 +271,39 @@ function zoomies(name, done) {
   if (!slow) hi.classList.add("motion");
 
   /* the film's cue sheet, in seconds */
-  var LOOP = 16.1667, LEAD = .4, TICK = 5.4454;
+  var LOOP = 16.1667, LEAD = .4;
   var START = [14.3, 2.3, 6.6, 10.6], LEN = [4.1667, 4.3, 4.0, 3.7], SEEK = [0, 2.5833, 7.0, 11.0];
   var ACCENT = ["#FFC531", "#FF5E8A", "#FF3DB8", "#A98BFF"];
-  var SHADE = [.48, .44, .48, .42], FLARE = .52, FLARES = [[5.8, 6.8], [9.9, 10.9], [13.8, 14.8]];
+  var SHADE = [.48, .44, .48, .42], FLARE = .52, FLARES = [[5.8, 6.8], [9.9, 10.9], [13.8, 14.8]], FIN = .56;
   var PATH = [62, 50, 30, 25, 28, 38, 50, 68, 62, 45, 50, 27, 25, 40, 50, 62];
   var since = function (t, w) { return (t - START[w] + LOOP) % LOOP; };
   var worldAt = function (t) { var w = 0; while (w < 3 && since(t, w) >= LEN[w]) w++; return w; };
   var early = [0, 0, 0, 0];
   var copyAt = function (t) { var w = worldAt(t); return since(t, w) > LEN[w] - LEAD - early[w] ? -1 : w; };
-  var corgiAt = function (t) {
+  var catAt = function (t) {
     var n = PATH.length, i = Math.floor(t), f = t - i, p = function (k) { return PATH[((k % n) + n) % n]; };
     var a = p(i - 1), b = p(i), c = p(i + 1), d = p(i + 2);
     return (b + .5 * f * (c - a + f * (2 * a - 5 * b + 4 * c - d + f * (3 * (b - c) + d - a)))) / 100;
   };
 
-  /* the name */
-  $(".nm").textContent = name || "Back";
+  /* the name, at the start and again at the end */
+  $$(".nm").forEach(function (e) { e.textContent = name || "Back"; });
   $(".g1").textContent = name ? "Hello" : "Welcome";
-  if (!name) $(".l1").textContent = "World 01 · Owner access";
+  $(".g2").textContent = name ? "Hello" : "Welcome";
 
-  var stage = $(".stage"), reel = $(".reel"), film = $(".film"), deck = $(".deck"), bar = $(".bar");
-  var copies = $$(".copy"), parts = $$(".part"), shades = $$(".shade"), stills = $$(".stills img");
-  var group = $(".worlds"), thumbs = $$(".thumb"), rings = thumbs.map(function (b) { return $("circle", b); });
-  var navs = $$(".links button");
-  var spin = $(".spin"), lit = $(".lit"), tip = $(".tip"), pause = $(".pause");
+  var stage = $(".stage"), reel = $(".reel"), film = $(".film"), deck = $(".deck");
+  var copies = $$(".copy"), parts = $$(".part"), shades = $$(".shade"), stills = $$(".stills img"), navs = $$(".links span");
   var tallQ = matchMedia("(max-aspect-ratio: 6/5)");
 
   var pen = document.createElement("canvas").getContext("2d");
   var W = 0, H = 0, typeReady = false;
-  var fit = function () {
+  var widest = function (sel) {
     pen.font = "400 100px " + getComputedStyle($(".title")).fontFamily;
-    var em = Math.max.apply(null, $$(".title span").map(function (s) { return pen.measureText(s.textContent.toUpperCase()).width / 100 + .01 * s.textContent.length; }));
-    deck.style.setProperty("--em", Math.max(em, 4.2).toFixed(3));
+    return Math.max.apply(null, $$(sel).map(function (s) { return pen.measureText(s.textContent.toUpperCase()).width / 100 + .01 * s.textContent.length; }));
+  };
+  var fit = function () {
+    deck.style.setProperty("--em", Math.max(widest(".copy:not(.fin) .title span"), 4.2).toFixed(3));
+    deck.style.setProperty("--em2", Math.max(widest(".fin .title span"), 3.4).toFixed(3));
   };
   var place = function () {
     W = stage.clientWidth; H = stage.clientHeight;
@@ -306,59 +313,25 @@ function zoomies(name, done) {
       p.style.setProperty("--ox", (W / 2 - x).toFixed(1) + "px");
       p.style.setProperty("--oy", (H / 2 - y).toFixed(1) + "px");
     });
-    tips(); drift();
-  };
-  var drift = function () {
     var fw = Math.max(W, H * 16 / 9), crop = (fw - W) * .62;
-    early = copies.map(function (c, w) {
+    early = [0, 1, 2, 3].map(function (w) {
+      var c = copies[w];
       if (tallQ.matches || !c.classList.contains("left")) return 0;
       var h = $(".title", c), x = h.offsetWidth + 12;
       for (var e = h; e && e !== stage; e = e.offsetParent) x += e.offsetLeft;
-      for (var s = LEN[w] - 2.5; s < LEN[w] - LEAD; s += .05) if ((corgiAt((START[w] + s) % LOOP) - .08) * fw - crop < x) return LEN[w] - LEAD - s + .25;
+      for (var s = LEN[w] - 2.5; s < LEN[w] - LEAD; s += .05) if ((catAt((START[w] + s) % LOOP) - .08) * fw - crop < x) return LEN[w] - LEAD - s + .25;
       return 0;
     });
   };
-  var tips = function () {
-    thumbs.forEach(function (b, i) {
-      var r = b.getBoundingClientRect(), c = (r.left + r.right) / 2, w = parseFloat(getComputedStyle(b, "::after").width) || 0, m = parseFloat(getComputedStyle(bar).paddingLeft);
-      b.style.setProperty("--tip", (Math.max(m + w / 2 - c, Math.min(0, innerWidth - m - w / 2 - c)) / (i === cur ? 1.33 : 1)).toFixed(1) + "px");
-    });
-  };
-
-  /* the film */
-  var held = false, pending = -1;
-  var run = function () { var p = film.play(); if (p && p.catch) p.catch(function (e) { if (e && e.name === "NotAllowedError") setPaused(true); }); };
-  var setPaused = function (p) {
-    held = p;
-    pause.classList.toggle("off", p);
-    pause.setAttribute("aria-label", p ? "Play the film" : "Pause the film");
-    if (p) film.pause(); else if (moving()) run();
-  };
-  if (film.readyState >= 2) hi.classList.add("ready");
-  film.addEventListener("loadeddata", function () { hi.classList.add("ready"); });
-  film.addEventListener("loadedmetadata", function () { if (pending >= 0) { film.currentTime = pending; pending = -1; } });
-  if (moving()) { if (!film.getAttribute("src")) film.src = film.dataset.src; film.currentTime = film.readyState >= 1 ? 0 : film.currentTime; run(); }
-  pause.addEventListener("click", function () { setPaused(!held); });
 
   /* worlds */
   var cur = -1, shown = -1, timers = [];
   var setWorld = function (w) {
     cur = w;
     hi.style.setProperty("--accent", ACCENT[w]);
-    hi.style.setProperty("--pos", (PATH[Math.round(SEEK[w]) % PATH.length]) + "%");
-    thumbs.forEach(function (b, i) {
-      b.setAttribute("aria-current", String(i === w));
-      b.classList.toggle("done", i < w);
-      b.tabIndex = i === w ? 0 : -1;
-      if (i !== w) rings[i].style.strokeDashoffset = "";
-    });
+    hi.style.setProperty("--pos", PATH[Math.round(SEEK[w]) % PATH.length] + "%");
     navs.forEach(function (b, i) { b.setAttribute("aria-current", String(i === w)); });
     stills.forEach(function (s, i) { s.classList.toggle("on", i === w); });
-    if (typeReady) tips();
-    if (!moving()) {
-      shades.forEach(function (s, i) { s.style.opacity = i === w % 2 ? SHADE[w] : 0; });
-      dialTo((w + 1) * 15);
-    }
   };
   var enterCopy = function (i) {
     var c = copies[i];
@@ -373,62 +346,52 @@ function zoomies(name, done) {
     if (c.classList.contains("on")) { c.classList.remove("on"); c.classList.add("off"); timers[i] = setTimeout(function () { c.classList.remove("off"); }, 720); }
   };
   var showCopy = function (i) { if (i === shown) return; if (shown >= 0) leaveCopy(shown); shown = i; if (i >= 0) enterCopy(i); };
+  copies.forEach(function (c) { c.inert = true; });
 
-  var litN = -1;
-  var dialTo = function (n) {
-    if (n === litN) return;
-    litN = n;
-    lit.style.strokeDasharray = n > 0 ? new Array(n + 1).join("1.1 4.3454 ") + "0 400" : "0 400";
-    tip.style.strokeDashoffset = (-(n - 1) * TICK).toFixed(2);
-    tip.style.opacity = n > 0 ? "" : "0";
+  /* the finale: the whole run has played, the name comes back with the way in */
+  var final = false, begun = performance.now();
+  var finale = function () {
+    if (final) return; final = true;
+    hi.classList.add("final");
+    setWorld(0);
+    if (moving()) { film.loop = true; try { film.currentTime = 0; } catch (e) {} var p = film.play(); if (p && p.catch) p.catch(function () {}); }
+    else shades.forEach(function (s, i) { s.style.opacity = i === 0 ? FIN : 0; });
+    showCopy(4);
+    setTimeout(function () { var b = $(".fin .cta"); if (b && !("ontouchstart" in window)) b.focus({ preventScroll: true }); }, 900);
   };
+  film.addEventListener("ended", finale);
 
-  var jumping = false, target = 0, jumpAt = 0, seekTimer = 0, sent = false, landed = false;
-  var jumpTo = function (w) {
-    if (!moving()) { setWorld(w); showCopy(w); return; }
-    if (w === (jumping ? target : cur)) return;
-    target = w; jumping = true; landed = sent = false; jumpAt = performance.now();
-    hi.classList.add("warp");
-    setWorld(w);
-    clearTimeout(seekTimer);
-    seekTimer = setTimeout(function () {
-      sent = true;
-      if (film.readyState >= 1) film.currentTime = SEEK[w]; else { pending = SEEK[w]; landed = true; }
-    }, 300);
-  };
-  film.addEventListener("seeked", function () { if (sent) landed = true; });
-  thumbs.forEach(function (b, i) { b.addEventListener("click", function () { jumpTo(i); }); });
-  navs.forEach(function (b, i) { b.addEventListener("click", function () { jumpTo(i); }); });
-  group.addEventListener("keydown", function (e) {
-    var i = thumbs.indexOf(document.activeElement);
-    var j = { ArrowRight: i + 1, ArrowDown: i + 1, ArrowLeft: i + 3, ArrowUp: i + 3, Home: 0, End: 3 }[e.key];
-    if (i < 0 || j === undefined) return;
-    e.preventDefault(); e.stopPropagation();
-    thumbs[j % 4].focus(); jumpTo(j % 4);
-  });
+  /* the film plays once, from the top */
+  if (film.readyState >= 2) hi.classList.add("ready");
+  film.addEventListener("loadeddata", function () { hi.classList.add("ready"); });
+  if (moving()) {
+    if (!film.getAttribute("src")) film.src = film.dataset.src;
+    film.loop = false;
+    try { if (film.readyState >= 1) film.currentTime = 0; } catch (e) {}
+    var pr = film.play();
+    if (pr && pr.catch) pr.catch(function () { finale(); });
+  }
 
-  var last = performance.now(), turn = 0, litNow = 0, panX = null, fade = [0, 0], alive = true;
+  var last = performance.now(), panX = null, fade = [0, 0], alive = true;
   var frame = function (now) {
     if (!alive) return;
     var dt = Math.min(.1, (now - last) / 1000); last = now;
     if (moving()) {
-      if (jumping && now - jumpAt > 460 && (landed || now - jumpAt > 2600)) { jumping = false; hi.classList.remove("warp"); }
-      var t = jumping ? SEEK[target] : film.readyState >= 1 ? film.currentTime % LOOP : 0;
-      var w = jumping ? target : worldAt(t);
+      if (!final && (now - begun > (LOOP + 12) * 1000 || (now - begun > 8000 && film.readyState < 2))) finale();
+      var t = film.readyState >= 1 ? Math.min(film.currentTime, LOOP - .001) : 0;
+      if (!final && film.readyState >= 1 && film.currentTime >= LOOP - .06) finale();
+      var w = worldAt(t);
       if (w !== cur) setWorld(w);
-      rings[w].style.strokeDashoffset = (151 * (1 - since(t, w) / LEN[w])).toFixed(1);
-      showCopy(jumping || !typeReady ? -1 : copyAt(t));
-      if (!film.paused) turn = (turn + dt * 9) % 360;
-      spin.style.rotate = (turn - 90).toFixed(2) + "deg";
-      litNow += (since(t, 0) / LOOP * 60 - litNow) * (1 - Math.exp(-dt * 9));
-      dialTo(Math.round(litNow));
-      var strength = FLARES.some(function (f) { return t > f[0] && t < f[1]; }) ? FLARE : tallQ.matches ? 0 : SHADE[w];
+      if (final) showCopy(4);
+      else showCopy(!typeReady || (t < .05 && film.paused) ? -1 : copyAt(t));
+      var strength = final ? (tallQ.matches ? FLARE : FIN) : FLARES.some(function (f) { return t > f[0] && t < f[1]; }) ? FLARE : tallQ.matches ? 0 : SHADE[w];
+      var side = final ? 0 : w % 2;
       shades.forEach(function (s, i) {
-        fade[i] += ((i === w % 2 ? strength : 0) - fade[i]) * (1 - Math.exp(-dt * 5));
+        fade[i] += ((i === side ? strength : 0) - fade[i]) * (1 - Math.exp(-dt * 5));
         s.style.opacity = fade[i].toFixed(3);
       });
       if (tallQ.matches && H) {
-        var rw = H * 16 / 9, x = Math.min(0, Math.max(W - rw, W / 2 - corgiAt(t) * rw));
+        var rw = H * 16 / 9, x = Math.min(0, Math.max(W - rw, W / 2 - catAt(t) * rw));
         panX = panX === null ? x : panX + (x - panX) * (1 - Math.exp(-dt * 4));
         reel.style.transform = "translate3d(" + panX.toFixed(1) + "px,0,0)";
       } else if (panX !== null) { reel.style.transform = ""; panX = null; }
@@ -443,22 +406,21 @@ function zoomies(name, done) {
 
   hi.style.display = "block";
   setWorld(0);
-  if (!moving()) showCopy(0);
+  if (!moving()) finale();
   if (document.fonts && document.fonts.load) Promise.all([document.fonts.load('400 1em "Dela Gothic One"'), document.fonts.load('400 1em "Outfit"')]).then(start, start);
   setTimeout(start, 1500);
   requestAnimationFrame(frame);
 
   var finished = false;
   var go = function () {
-    if (finished) return; finished = true;
+    if (!final || finished) return; finished = true;
     removeEventListener("resize", onResize); document.removeEventListener("keydown", key);
     hi.classList.add("leaving");
     setTimeout(function () { alive = false; try { film.pause(); } catch (e) {} done(); }, slow ? 0 : 480);
   };
-  var key = function (e) { if (e.key === "Enter" && !(document.activeElement && document.activeElement.closest && document.activeElement.closest(".worlds,.links,.pause"))) go(); };
+  var key = function (e) { if (e.key === "Enter") go(); };
   $$(".zenter").forEach(function (b) { b.addEventListener("click", go); });
   document.addEventListener("keydown", key);
-  var ctas = $$(".cta"); setTimeout(function () { var c = ctas[0]; if (c && !("ontouchstart" in window)) c.focus({ preventScroll: true }); }, 900);
   return { stop: function () { alive = false; } };
 }
 
