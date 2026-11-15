@@ -18,7 +18,6 @@ p{color:#9AA0AE;margin:0 0 22px;font-size:14px}
 #pc:focus{border-color:#D4AF37}
 button{width:100%;margin-top:12px;padding:15px;border:0;border-radius:999px;background:#D4AF37;color:#0A0B0E;font-weight:700;font-size:16px}
 button:disabled{opacity:.6}
-.note{margin-top:14px;color:#9AA0AE;font-size:13px}
 .view{margin-top:16px;color:#6B7280;font-size:12px}.view a{color:#D4AF37;text-decoration:none}
 .err{color:#FCA5A5;min-height:20px;margin-top:10px;font-size:13px}
 </style></head>
@@ -33,7 +32,7 @@ button:disabled{opacity:.6}
   <div class="err" id="err" role="alert"></div>
 </form></div>
 <script>
-var SALT="O+SzrsmD24PKlkDt/ZAfnw==",ITER=600000,FILES={"d": "c4e6ddfec8-d.bin", "m": "c4e6ddfec8-m.bin"},IVS={"d": "nFC2KI4NC4hhQ/f5", "m": "kt7DpndMwyaaCfvy"},CIV="yXSoQTBqRegRGZGY",CHK="Sqao98rrny2qIEoO0GMxcdlL";
+var SALT="rU4BwchcM9kVJNTVhZR1Zw==",ITER=600000,FILES={"d": "c85c110162-d.bin", "m": "c85c110162-m.bin"},IVS={"d": "OgWFI77vFCa38nBi", "m": "25rTxm9BFATQM/r9"},WR=[{"i": "5fmFpXLTw2q1BRYn", "c": "3iwPCW8w8DbU+r4Hwzh3Mc7K/u+w7DPQfuD8+A675sktWaeH5WfKTUqkTafMwZB0"}, {"i": "tHphA0Q5f0qLrbdw", "c": "y7KAqkX8eXI1M/h2JpjVWNNMPi/bNEK9JqRJ6qi6Pze1SOAlfBcZNfrIRvW1ptUsQkQ="}, {"i": "Wh3MYARWNP3Ese9A", "c": "1ifecXBXC8wc2GUwmOLg3jG7hE4r21GyDnx1+Dbiq6Mw7DnHqMhCxsapAzdWHGGatsxuFA=="}, {"i": "s16fPInO/S8jFgte", "c": "0UNlYByEIk+UVHRUJ9yfyyWYSNw6FGxkxgoE+d+cZank3+i62HEdJpYu2Lu0QVbrTZnEtLc="}, {"i": "RZRAhcDq4sEUx5+D", "c": "hWI5ew4kKFSGrsGKy6q9lwoJY56GQUAFFXGcLSQF6ahKjJzMp9iqpgzilhyDgZlWWE0="}];
 function isPhone(){var w=Math.min(screen.width,screen.height);var touch=window.matchMedia&&matchMedia("(pointer:coarse)").matches;return (touch&&w<700)||innerWidth<500;}
 var VIEW=isPhone()?"m":"d",got={};
 function load(v){if(!got[v])got[v]=fetch(FILES[v],{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("stale");return r.arrayBuffer();});return got[v];}
@@ -41,7 +40,8 @@ function label(){document.getElementById("vname").textContent=VIEW=="m"?"Phone v
 function u8(s){var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
 async function keyFrom(pass){var base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveBits"]);var bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:u8(SALT),iterations:ITER,hash:"SHA-256"},base,256);return new Uint8Array(bits);}
 async function aes(raw){return crypto.subtle.importKey("raw",raw,"AES-GCM",false,["decrypt"]);}
-async function check(raw){await crypto.subtle.decrypt({name:"AES-GCM",iv:u8(CIV)},await aes(raw),u8(CHK));}
+async function open1(pk){var k=await aes(pk);for(var i=0;i<WR.length;i++){try{var p=new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM",iv:u8(WR[i].i)},k,u8(WR[i].c)));return {k:p.slice(0,32),n:new TextDecoder().decode(p.slice(32))};}catch(e){}}return null;}
+function stamp(n){if(!n)return "";n=n.replace(/[^A-Za-z0-9 ]/g,"").slice(0,20);var svg='<svg xmlns="http://www.w3.org/2000/svg" width="240" height="150"><text x="120" y="80" transform="rotate(-24 120 75)" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700" fill="#8A8F9C" fill-opacity="0.13">'+n+'</text></svg>';return '<div aria-hidden="true" style="position:fixed;inset:0;z-index:2147483646;pointer-events:none;background-image:url(&quot;data:image/svg+xml;utf8,'+encodeURIComponent(svg)+'&quot;)"></div>';}
 async function unlock(raw,v){
   var key=await aes(raw);var ct=await load(v);
   var plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:u8(IVS[v])},key,ct);
@@ -49,29 +49,29 @@ async function unlock(raw,v){
   return await new Response(stream).text();
 }
 var AWAY=60000,HANDOFF=15000;
-function guard(k,v){return "<script>(function(K,V,AWAY){var away=0,lock=false;"+
+function guard(k,v,n){return "<script>(function(K,V,N,AWAY){var away=0,lock=false;"+
  "function lockNow(){lock=true;try{sessionStorage.removeItem('me_h')}catch(e){}location.reload();}"+
- "addEventListener('pagehide',function(){if(lock)return;try{sessionStorage.setItem('me_h',JSON.stringify({k:K,v:V,t:Date.now()}))}catch(e){}});"+
+ "addEventListener('pagehide',function(){if(lock)return;try{sessionStorage.setItem('me_h',JSON.stringify({k:K,v:V,n:N,t:Date.now()}))}catch(e){}});"+
  "addEventListener('pageshow',function(e){if(e.persisted){try{sessionStorage.removeItem('me_h')}catch(x){}if(away&&Date.now()-away>AWAY)lockNow();}});"+
  "document.addEventListener('visibilitychange',function(){if(document.hidden){away=Date.now();}else{if(away&&Date.now()-away>AWAY)lockNow();away=0;}});"+
- "})('"+k+"','"+v+"',"+AWAY+");<\/script>";}
-function show(html,k,v){html=html.replace("<head>","<head>"+guard(k,v));
+ "})('"+k+"','"+v+"',"+JSON.stringify(n||"")+","+AWAY+");<\/script>";}
+function show(html,k,v,n){html=html.replace("<head>","<head>"+guard(k,v,n));var e=html.lastIndexOf("</body>");html=e<0?html+stamp(n):html.slice(0,e)+stamp(n)+html.slice(e);
   if(v=="d"&&Math.min(screen.width,innerWidth)<1000){var vp='<meta name="viewport" content="width=1280">';html=/<meta name="viewport"[^>]*>/.test(html)?html.replace(/<meta name="viewport"[^>]*>/,vp):html.replace("<head>","<head>"+vp);}document.open();document.write(html);document.close();}
 function b64(a){var s="";for(var i=0;i<a.length;i++)s+=String.fromCharCode(a[i]);return btoa(s);}
 try{localStorage.removeItem("me_k");sessionStorage.removeItem("me_k");}catch(e){}
 (async function(){var h=null;try{h=JSON.parse(sessionStorage.getItem("me_h")||"null");sessionStorage.removeItem("me_h");}catch(e){}
-  if(h&&h.k&&Date.now()-h.t<HANDOFF&&Date.now()>=h.t){var v=h.v=="m"||h.v=="d"?h.v:VIEW;try{show(await unlock(u8(h.k),v),h.k,v);return;}catch(e){}}
+  if(h&&h.k&&Date.now()-h.t<HANDOFF&&Date.now()>=h.t){var v=h.v=="m"||h.v=="d"?h.v:VIEW;try{show(await unlock(u8(h.k),v),h.k,v,typeof h.n=="string"?h.n:"");return;}catch(e){}}
   label();load(VIEW).catch(function(){});})();
 document.getElementById("vswap").addEventListener("click",function(e){e.preventDefault();VIEW=VIEW=="m"?"d":"m";label();load(VIEW).catch(function(){});});
 document.getElementById("f").addEventListener("submit",async function(e){
   e.preventDefault();var btn=document.getElementById("go"),err=document.getElementById("err");
-  var pass=document.getElementById("pc").value;if(!pass){err.textContent="Enter the passcode.";return;}
+  var pass=document.getElementById("pc").value.replace(/\s+/g,"").toLowerCase();if(!pass){err.textContent="Enter the passcode.";return;}
   if(!window.crypto||!crypto.subtle||!window.DecompressionStream){err.textContent="This browser is too old to open it. Update iOS or try Chrome.";return;}
   btn.disabled=true;btn.textContent="Opening...";err.textContent="";
-  var raw,html=null,why="That passcode didn't work.";
-  try{raw=await keyFrom(pass);await check(raw);}catch(x){raw=null;}
-  if(raw){try{html=await unlock(raw,VIEW);}catch(x){got[VIEW]=null;why="A newer version just went up. Refresh the page and try again.";}}
-  if(html){document.getElementById("pc").value="";show(html,b64(raw),VIEW);return;}
+  var who=null,html=null,why="That passcode didn't work.";
+  try{who=await open1(await keyFrom(pass));}catch(x){who=null;}
+  if(who){try{html=await unlock(who.k,VIEW);}catch(x){got[VIEW]=null;why="A newer version just went up. Refresh the page and try again.";}}
+  if(html){document.getElementById("pc").value="";show(html,b64(who.k),VIEW,who.n);return;}
   btn.disabled=false;btn.textContent="Open";err.textContent=why;
 });
 </script></body></html>
