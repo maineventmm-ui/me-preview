@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Main Event">
+<meta name="robots" content="noindex,nofollow">
+<title>Main Event Preview</title>
+<style>
+:root{color-scheme:dark}
+html,body{margin:0;background:#0A0B0E;color:#fff;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+.wrap{min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:24px max(16px,env(safe-area-inset-left)) 24px max(16px,env(safe-area-inset-right));box-sizing:border-box}
+.card{width:100%;max-width:360px;text-align:center}
+.mark{width:56px;height:56px;margin:0 auto 18px;border-radius:16px;background:linear-gradient(135deg,#F3D27A,#D4AF37 55%,#9C7A1C);display:flex;align-items:center;justify-content:center;color:#0A0B0E;font-weight:800;font-size:20px;letter-spacing:.02em}
+h1{font-size:22px;margin:0 0 6px}
+p{color:#9AA0AE;margin:0 0 22px;font-size:14px}
+#pc{-webkit-text-security:disc;width:100%;box-sizing:border-box;padding:15px 16px;border-radius:14px;border:1px solid #2A2E3A;background:#13151B;color:#fff;font-size:17px;outline:none}
+#pc:focus{border-color:#D4AF37}
+button{width:100%;margin-top:12px;padding:15px;border:0;border-radius:999px;background:#D4AF37;color:#0A0B0E;font-weight:700;font-size:16px}
+button:disabled{opacity:.6}
+.note{margin-top:14px;color:#9AA0AE;font-size:13px}
+.view{margin-top:16px;color:#6B7280;font-size:12px}.view a{color:#D4AF37;text-decoration:none}
+.err{color:#FCA5A5;min-height:20px;margin-top:10px;font-size:13px}
+</style></head>
+<body>
+<div class="wrap" id="gate"><form class="card" id="f">
+  <div class="mark">ME</div>
+  <h1>Main Event preview</h1>
+  <p>Private. Enter the passcode to open it.</p>
+  <input id="pc" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="me-entry" placeholder="Passcode" autofocus aria-label="Passcode">
+  <button id="go" type="submit">Open</button>
+  <div class="view"><span id="vname"></span> · <a href="#" id="vswap"></a></div>
+  <div class="err" id="err" role="alert"></div>
+</form></div>
+<script>
+var SALT="O+SzrsmD24PKlkDt/ZAfnw==",ITER=600000,FILES={"d": "c4e6ddfec8-d.bin", "m": "c4e6ddfec8-m.bin"},IVS={"d": "nFC2KI4NC4hhQ/f5", "m": "kt7DpndMwyaaCfvy"},CIV="yXSoQTBqRegRGZGY",CHK="Sqao98rrny2qIEoO0GMxcdlL";
+function isPhone(){var w=Math.min(screen.width,screen.height);var touch=window.matchMedia&&matchMedia("(pointer:coarse)").matches;return (touch&&w<700)||innerWidth<500;}
+var VIEW=isPhone()?"m":"d",got={};
+function load(v){if(!got[v])got[v]=fetch(FILES[v],{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("stale");return r.arrayBuffer();});return got[v];}
+function label(){document.getElementById("vname").textContent=VIEW=="m"?"Phone view":"Desktop view";document.getElementById("vswap").textContent=VIEW=="m"?"Switch to desktop":"Switch to phone";}
+function u8(s){var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
+async function keyFrom(pass){var base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveBits"]);var bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:u8(SALT),iterations:ITER,hash:"SHA-256"},base,256);return new Uint8Array(bits);}
+async function aes(raw){return crypto.subtle.importKey("raw",raw,"AES-GCM",false,["decrypt"]);}
+async function check(raw){await crypto.subtle.decrypt({name:"AES-GCM",iv:u8(CIV)},await aes(raw),u8(CHK));}
+async function unlock(raw,v){
+  var key=await aes(raw);var ct=await load(v);
+  var plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:u8(IVS[v])},key,ct);
+  var stream=new Blob([plain]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return await new Response(stream).text();
+}
+var AWAY=60000,HANDOFF=15000;
+function guard(k,v){return "<script>(function(K,V,AWAY){var away=0,lock=false;"+
+ "function lockNow(){lock=true;try{sessionStorage.removeItem('me_h')}catch(e){}location.reload();}"+
+ "addEventListener('pagehide',function(){if(lock)return;try{sessionStorage.setItem('me_h',JSON.stringify({k:K,v:V,t:Date.now()}))}catch(e){}});"+
+ "addEventListener('pageshow',function(e){if(e.persisted){try{sessionStorage.removeItem('me_h')}catch(x){}if(away&&Date.now()-away>AWAY)lockNow();}});"+
+ "document.addEventListener('visibilitychange',function(){if(document.hidden){away=Date.now();}else{if(away&&Date.now()-away>AWAY)lockNow();away=0;}});"+
+ "})('"+k+"','"+v+"',"+AWAY+");<\/script>";}
+function show(html,k,v){html=html.replace("<head>","<head>"+guard(k,v));
+  if(v=="d"&&Math.min(screen.width,innerWidth)<1000){var vp='<meta name="viewport" content="width=1280">';html=/<meta name="viewport"[^>]*>/.test(html)?html.replace(/<meta name="viewport"[^>]*>/,vp):html.replace("<head>","<head>"+vp);}document.open();document.write(html);document.close();}
+function b64(a){var s="";for(var i=0;i<a.length;i++)s+=String.fromCharCode(a[i]);return btoa(s);}
+try{localStorage.removeItem("me_k");sessionStorage.removeItem("me_k");}catch(e){}
+(async function(){var h=null;try{h=JSON.parse(sessionStorage.getItem("me_h")||"null");sessionStorage.removeItem("me_h");}catch(e){}
+  if(h&&h.k&&Date.now()-h.t<HANDOFF&&Date.now()>=h.t){var v=h.v=="m"||h.v=="d"?h.v:VIEW;try{show(await unlock(u8(h.k),v),h.k,v);return;}catch(e){}}
+  label();load(VIEW).catch(function(){});})();
+document.getElementById("vswap").addEventListener("click",function(e){e.preventDefault();VIEW=VIEW=="m"?"d":"m";label();load(VIEW).catch(function(){});});
+document.getElementById("f").addEventListener("submit",async function(e){
+  e.preventDefault();var btn=document.getElementById("go"),err=document.getElementById("err");
+  var pass=document.getElementById("pc").value;if(!pass){err.textContent="Enter the passcode.";return;}
+  if(!window.crypto||!crypto.subtle||!window.DecompressionStream){err.textContent="This browser is too old to open it. Update iOS or try Chrome.";return;}
+  btn.disabled=true;btn.textContent="Opening...";err.textContent="";
+  var raw,html=null,why="That passcode didn't work.";
+  try{raw=await keyFrom(pass);await check(raw);}catch(x){raw=null;}
+  if(raw){try{html=await unlock(raw,VIEW);}catch(x){got[VIEW]=null;why="A newer version just went up. Refresh the page and try again.";}}
+  if(html){document.getElementById("pc").value="";show(html,b64(raw),VIEW);return;}
+  btn.disabled=false;btn.textContent="Open";err.textContent=why;
+});
+</script></body></html>
