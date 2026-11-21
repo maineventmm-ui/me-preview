@@ -20,7 +20,11 @@ p{color:#9AA0AE;margin:0 0 22px;font-size:14px}
 #pc:focus{border-color:#D4AF37}
 button{width:100%;margin-top:12px;padding:15px;border:0;border-radius:999px;background:#D4AF37;color:#0A0B0E;font-weight:700;font-size:16px}
 button:disabled{opacity:.6}
-.view{margin-top:16px;color:#6B7280;font-size:12px}.view a{color:#D4AF37;text-decoration:none}
+.view{margin-top:18px;color:#6B7280;font-size:12px}.view a{color:#D4AF37;text-decoration:none}
+.views{display:flex;gap:4px;padding:4px;border-radius:999px;background:#13151B;border:1px solid #2A2E3A;margin:16px auto 0;width:max-content}
+.views button{width:auto;margin:0;padding:9px 16px;border-radius:999px;background:none;color:#9AA0AE;font-weight:600;font-size:13.5px}
+.views button[aria-pressed="true"]{background:#fff;color:#0A0B0E}
+.vhint{margin-top:8px;color:#6B7280;font-size:12px;min-height:18px}
 @property --accent { syntax: "<color>"; inherits: true; initial-value: #FFC531; }
 #hi { --white: #FFFFFF; --cream: #FFF8EC; --ink: #1A1026; --gold: #FFCB3D; --sky: #8FACC9; --accent: #FFC531;
   --glass: rgba(26, 16, 38, .5); --rim: rgba(255, 255, 255, .24); --frost: blur(14px) saturate(140%);
@@ -233,15 +237,17 @@ button:disabled{opacity:.6}
   <p>Private. Enter the passcode to open it.</p>
   <input id="pc" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="me-entry" placeholder="Passcode" autofocus aria-label="Passcode">
   <button id="go" type="submit">Open</button>
-  <div class="view"><span id="vname"></span> · <a href="#" id="vswap"></a></div>
+  <div class="views" role="group" aria-label="Open as" id="views"></div><div class="vhint" id="vhint"></div>
   <div class="err" id="err" role="alert"></div>
 </form></div>
 <script>
-var SALT="HKv9IjSCQrSxuPyeIe/FrA==",ITER=600000,FILES={"d": "e16e61f3c0-d.bin", "m": "e16e61f3c0-m.bin"},IVS={"d": "TaH0dKK8l3dpco+x", "m": "JYXz8z3qgh+sgMX7"},WR=[{"i": "WYHZO6qMSmtQrbQf", "c": "0Gq/JxR2vflJk0rn6TrDzgOIIL4sk5+jJcuQb9XlWvm3Cwa8iFwV5se4tNe+OBJmytbyz24="}, {"i": "P8vT2yYF8wDkf6aV", "c": "WzrzRrBzYD2JK3RabMqAkiDfphbD6oTFehK+EVlTLgOequBmK9B4NGB1FaAIUNG1hc1R+A=="}, {"i": "qKtcm7YiFddWMv9O", "c": "vfP3Wm6wAEePZakfsutBCYo4Co1MJ5BVjAbTm6Qxs2hgJz1me66vVMEV/dOIsvZa"}, {"i": "Dxb9E1CatpZmFvxO", "c": "yQ+LZRixXJE4GUJN40TkReTgfg+IwIJBkIUL56fCP1iBZE4+uf0N6BSQzkzf7DVx4B0="}, {"i": "HADcEOwocCfPsOfF", "c": "MSau6eKWQuaU/dTJ3XGZQoX3E26Mg5JgFvFluB3Uw6mBMLYsfgaqNijsaSt70SvniKo="}];
+var SALT="bheo+4Iqu+2w7eWeU4cteQ==",ITER=600000,FILES={"d": "d339d1d6af-d.bin", "m": "d339d1d6af-m.bin", "a": "d339d1d6af-a.bin"},IVS={"d": "rJ9sKLVntrYnXvi4", "m": "QQ6xPIhKBMjRTXNR", "a": "4Bq2N5IBjBXvRBD7"},WR=[{"i": "+NDyuVUK+8gf/HuV", "c": "Hx3h85zeGIA3t+mND2e92TMPFc2+Z6fHYlh2zAy9th3NTvmUft2tuXHX1la3qTttHsWY+js="}, {"i": "8yTjmWALgPjLVxsL", "c": "J1fiGBjtT1F4DpT3N31ZX3iyuTL3eci2X83Pog1nHyxlrEm7vA9zoKlYDlQdhr43"}, {"i": "h/4iENWETauvq6/J", "c": "58hkT/7YON6aeIRdk1yWte4dmqn8bw+M1KJyNhaKC/9GpgRq9phnLugukEw3j3S9KblHSg=="}, {"i": "lTeegP8InfUl6AGv", "c": "OMqJuwNlgI8n5Hu/5JfWTMwWLZw0RIrXkXU+fv5qLN2t1hqQmyeDM6pl69EzKg6o5JA="}, {"i": "cmMCwy/M+h4ftKvT", "c": "uw4XmLKWNTNwljKTW5k1GHK4I8992rSD/1q3cbVr181DcDKmrpYfqcnTl1+rLWmwpjE="}];
 function isPhone(){var w=Math.min(screen.width,screen.height);var touch=window.matchMedia&&matchMedia("(pointer:coarse)").matches;return (touch&&w<700)||innerWidth<500;}
-var VIEW=isPhone()?"m":"d",got={};
+var Q=location.search+location.hash,APPUA=/MainEventApp/.test(navigator.userAgent);
+var VIEW=(FILES.a&&(APPUA||/[?&#]v=a|#app/.test(Q)))?"a":/[?&#]v=m/.test(Q)?"m":/[?&#]v=d/.test(Q)?"d":isPhone()?(FILES.a?"a":"m"):"d",got={};
 function load(v){if(!got[v])got[v]=fetch(FILES[v],{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("stale");return r.arrayBuffer();});return got[v];}
-function label(){document.getElementById("vname").textContent=VIEW=="m"?"Phone view":"Desktop view";document.getElementById("vswap").textContent=VIEW=="m"?"Switch to desktop":"Switch to phone";}
+var VN={d:["Desktop","The full website, desktop layout"],m:["Phone","The website, made for phones"],a:["App","The Main Event app"]};
+function label(){var box=document.getElementById("views");box.innerHTML="";["d","m","a"].forEach(function(v){if(!FILES[v])return;var b=document.createElement("button");b.type="button";b.textContent=VN[v][0];b.setAttribute("aria-pressed",v==VIEW);b.onclick=function(){VIEW=v;label();load(VIEW).catch(function(){});};box.appendChild(b);});document.getElementById("vhint").textContent=VN[VIEW][1];}
 function u8(s){var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
 async function keyFrom(pass){var base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveBits"]);var bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:u8(SALT),iterations:ITER,hash:"SHA-256"},base,256);return new Uint8Array(bits);}
 async function aes(raw){return crypto.subtle.importKey("raw",raw,"AES-GCM",false,["decrypt"]);}
@@ -255,6 +261,7 @@ async function unlock(raw,v){
 }
 var AWAY=60000,HANDOFF=15000;
 function guard(k,v,n){return "<script>(function(K,V,N,AWAY){var away=0,lock=false;"+
+ "window.__meSwitch=function(nv){if(['d','m','a'].indexOf(nv)<0)return;V=nv;location.reload();};"+
  "function lockNow(){lock=true;try{sessionStorage.removeItem('me_h')}catch(e){}location.reload();}"+
  "addEventListener('pagehide',function(){if(lock)return;try{sessionStorage.setItem('me_h',JSON.stringify({k:K,v:V,n:N,t:Date.now()}))}catch(e){}});"+
  "addEventListener('pageshow',function(e){if(e.persisted){try{sessionStorage.removeItem('me_h')}catch(x){}if(away&&Date.now()-away>AWAY)lockNow();}});"+
@@ -434,10 +441,9 @@ function welcome(html,k,v,n){
 function b64(a){var s="";for(var i=0;i<a.length;i++)s+=String.fromCharCode(a[i]);return btoa(s);}
 try{localStorage.removeItem("me_k");sessionStorage.removeItem("me_k");}catch(e){}
 (async function(){var h=null;try{h=JSON.parse(sessionStorage.getItem("me_h")||"null");sessionStorage.removeItem("me_h");}catch(e){}
-  if(h&&h.k&&Date.now()-h.t<HANDOFF&&Date.now()>=h.t){var v=h.v=="m"||h.v=="d"?h.v:VIEW;try{show(await unlock(u8(h.k),v),h.k,v,typeof h.n=="string"?h.n:"");return;}catch(e){}}
+  if(h&&h.k&&Date.now()-h.t<HANDOFF&&Date.now()>=h.t){var v=FILES[h.v]?h.v:VIEW;try{show(await unlock(u8(h.k),v),h.k,v,typeof h.n=="string"?h.n:"");return;}catch(e){}}
   label();load(VIEW).catch(function(){});
   try{var zf=document.querySelector("#hi .film");if(zf&&!zf.getAttribute("src")&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){zf.src=zf.dataset.src;zf.load();}}catch(e){}})();
-document.getElementById("vswap").addEventListener("click",function(e){e.preventDefault();VIEW=VIEW=="m"?"d":"m";label();load(VIEW).catch(function(){});});
 document.getElementById("f").addEventListener("submit",async function(e){
   e.preventDefault();var btn=document.getElementById("go"),err=document.getElementById("err");
   var pass=document.getElementById("pc").value.replace(/\s+/g,"").toLowerCase();if(!pass){err.textContent="Enter the passcode.";return;}
