@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="robots" content="noindex"><title>Player</title>
+<style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#p,iframe{position:absolute;left:0;top:0;width:100%;height:100%;border:0}</style></head>
+<body><div id="p"></div>
+<script>
+/* A YouTube player on a real web address, for pages that cannot hold one themselves. ?v=<video id>&t=<start seconds>
+   It tells the page around it what the player is doing, and takes play, pause, seek and load from it. */
+(function () {
+  var q = new URLSearchParams(location.search), clean = function (s) { return String(s || '').replace(/[^\w-]/g, '').slice(0, 20); };
+  var v = clean(q.get('v')), start = Math.max(0, parseInt(q.get('t') || '0', 10) || 0), P = null;
+  function say(m) { m.yt = 1; try { parent.postMessage(m, '*'); } catch (e) {} }
+  function now(ev, x) { var m = { ev: ev }; try { m.t = P.getCurrentTime() || 0; m.dur = P.getDuration() || 0; m.st = P.getPlayerState(); } catch (e) {} for (var k in x || {}) m[k] = x[k]; say(m); }
+  if (!v) { say({ ev: 'error', code: -2 }); return; }
+  window.onYouTubeIframeAPIReady = function () {
+    P = new YT.Player('p', { videoId: v, host: 'https://www.youtube-nocookie.com', playerVars: { playsinline: 1, rel: 0, start: start, origin: location.origin, controls: 1, fs: 1 },
+      events: { onReady: function () { now('ready'); setInterval(function () { now('time'); }, 1000); }, onStateChange: function () { now('state'); }, onError: function (e) { say({ ev: 'error', code: e.data }); } } });
+  };
+  window.addEventListener('message', function (e) {
+    var m = e.data || {}; if (!P || !m.cmd) return;
+    try { if (m.cmd === 'play') P.playVideo(); else if (m.cmd === 'pause') P.pauseVideo(); else if (m.cmd === 'seek') P.seekTo(+m.t || 0, true); else if (m.cmd === 'load') P.loadVideoById({ videoId: clean(m.v), startSeconds: +m.t || 0 }); else if (m.cmd === 'cue') P.cueVideoById({ videoId: clean(m.v), startSeconds: +m.t || 0 }); } catch (x) {}
+  });
+  var s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; s.onerror = function () { say({ ev: 'error', code: -1 }); }; document.head.appendChild(s);
+})();
+</script>
+</body></html>
